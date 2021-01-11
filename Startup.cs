@@ -51,7 +51,8 @@ namespace Barna_Valentina_Proiect_Pies
 
             app.UseRouting();
 
-         //   app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -59,6 +60,7 @@ namespace Barna_Valentina_Proiect_Pies
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapRazorPages();
             });
         }
     }
