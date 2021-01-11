@@ -15,11 +15,17 @@ namespace Barna_Valentina_Proiect_Pies.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Pie> Pies { get; set; }
+        public DbSet<Retailer> Retailers { get; set; }
+        public DbSet<RetailedPie> RetailedPies { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>().ToTable("Customer");
             modelBuilder.Entity<Order>().ToTable("Order");
             modelBuilder.Entity<Pie>().ToTable("Pie");
+            modelBuilder.Entity<Retailer>().ToTable("Retailer");
+            modelBuilder.Entity<RetailedPie>().ToTable("RetailedPie");
+            modelBuilder.Entity<RetailedPie>()
+            .HasKey(c => new { c.PieID, c.RetailerID });//configureaza cheia primara compusa
         }
     }
 }

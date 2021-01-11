@@ -20,9 +20,46 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
         }
 
         // GET: Pies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            return View(await _context.Pies.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var pies = from b in _context.Pies
+                        select b;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                pies = pies.Where(s => s.Name.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc"
+            :
+                    pies = pies.OrderByDescending(b => b.Name);
+            break;
+                case "Price":
+                    pies = pies.OrderBy(b => b.Price);
+            break;
+                case "price_desc":
+                    pies = pies.OrderByDescending(b => b.Price);
+            break;
+            default:
+                    pies = pies.OrderBy(b => b.Name);
+            break;
+        }
+        int pageSize = 2;
+            return View(await PaginatedList<Pie>.CreateAsync(pies.AsNoTracking(), pageNumber ??1, pageSize));
         }
 
         // GET: Pies/Details/5
@@ -34,7 +71,10 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
             }
 
             var pie = await _context.Pies
-                .FirstOrDefaultAsync(m => m.ID == id);
+               .Include(s => s.Orders)
+               .ThenInclude(e => e.Customer)
+               .AsNoTracking()
+               .FirstOrDefaultAsync(m => m.ID == id);
             if (pie == null)
             {
                 return NotFound();
@@ -54,13 +94,18 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,ShortDescription,Price")] Pie pie)
-        {
-            if (ModelState.IsValid)
+        public async Task<IActionResult> Create([Bind("Name,ShortDescription,Price")] Pie pie)
+        {try
             {
-                _context.Add(pie);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(pie);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            } catch (DbUpdateException /* ex*/)
+            {
+                ModelState.AddModelError("", "Unable to save changes." + "Try again, and if the problem persists ");
             }
             return View(pie);
         }
@@ -86,38 +131,35 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,ShortDescription,Price")] Pie pie)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != pie.ID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var pieToUpdate = await _context.Pies.FirstOrDefaultAsync(s => s.ID == id);
+
+            if (await TryUpdateModelAsync<Pie>(
+                pieToUpdate,
+                "",
+                s => s.Name, s => s.ShortDescription, s => s.Price))
             {
                 try
                 {
-                    _context.Update(pie);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!PieExists(pie.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "Unable to save changes." + "Try again, and if the problem persists");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(pie);
+            return View(pieToUpdate);
         }
 
         // GET: Pies/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -125,10 +167,16 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
             }
 
             var pie = await _context.Pies
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (pie == null)
             {
                 return NotFound();
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "Delete failed. Try again";
             }
 
             return View(pie);
@@ -140,9 +188,19 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var pie = await _context.Pies.FindAsync(id);
-            _context.Pies.Remove(pie);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (pie == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            try
+            {
+                _context.Pies.Remove(pie);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            } catch(DbUpdateException /* ex */)
+            {
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
 
         private bool PieExists(int id)

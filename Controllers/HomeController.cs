@@ -27,6 +27,10 @@ namespace Barna_Valentina_Proiect_Pies.Controllers
         {
             return View();
         }
+        public IActionResult Chat()
+        {
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -9,7 +9,7 @@ namespace Barna_Valentina_Proiect_Pies.Models
     {
         public int OrderID { get; set; }
         public int CustomerID { get; set; }
-        public int BookID { get; set; }
+        public int PieID { get; set; }
 
         public DateTime OrderDate { get; set; }
 
