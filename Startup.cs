@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Barna_Valentina_Proiect_Pies.Hubs;
 
 namespace Barna_Valentina_Proiect_Pies
 {
@@ -29,6 +30,7 @@ namespace Barna_Valentina_Proiect_Pies
             //   services.AddAuthorization;
             services.AddControllersWithViews();
             services.AddControllers();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +58,7 @@ namespace Barna_Valentina_Proiect_Pies
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }
