@@ -10,10 +10,10 @@ namespace Barna_Valentina_Proiect_Pies.Data
     {
         public static void Initialize(PieContext context) { 
         context.Database.EnsureCreated();
-            if (context.Pies.Any())
+           if (context.Pies.Any())
             {
-                return; // BD a fost creata anterior
-            }
+               return; // BD a fost creata anterior
+           }
             var pies = new Pie[]
             {
                  new Pie{Name="Placinta cu mere",ShortDescription="Prăjitură simplă cu mere rase călite cu zahăr și scorțișoară și aluat fraged",Price=Decimal.Parse("105")},
@@ -56,51 +56,51 @@ foreach (Order e in orders)
     context.Orders.Add(e);
 }
 context.SaveChanges();
-            var publishers = new Retailer[]
+            var retailers = new Retailer[]
  {
 
  new Retailer{RetailerName="Mama Luta",Adress="Str. Principala, nr. 40, Ampoita"},
  new Retailer{RetailerName="CorinaSweets",Adress="Str. Motilor, nr. 35, Alba-Iulia"},
  new Retailer{RetailerName="Byron",Adress="Str. 1Decembrie, nr. 22, Alba-Iulia"},
  };
-            foreach (Retailer p in publishers)
+            foreach (Retailer p in retailers)
             {
                 context.Retailers.Add(p);
             }
             context.SaveChanges();
-            var publishedpies = new RetailedPie[]
+            var retailedpies = new RetailedPie[]
             {
  new RetailedPie {
  PieID = pies.Single(c => c.Name == "Placinta cu varza" ).ID,
- RetailerID = publishers.Single(i => i.RetailerName ==
+ RetailerID = retailers.Single(i => i.RetailerName ==
 "Mama Luta").ID
  },
  new RetailedPie {
  PieID = pies.Single(c => c.Name == "Placinta cu mere" ).ID,
-RetailerID = publishers.Single(i => i.RetailerName ==
+RetailerID = retailers.Single(i => i.RetailerName ==
 "Mama Luta").ID
  },
  new RetailedPie {
  PieID = pies.Single(c => c.Name == "Cheesecake cu oreo" ).ID,
- RetailerID = publishers.Single(i => i.RetailerName ==
+ RetailerID = retailers.Single(i => i.RetailerName ==
 "CorinaSweets").ID
  },
  new RetailedPie {
  PieID = pies.Single(c => c.Name == "Cheesecake cu afine" ).ID,
-RetailerID = publishers.Single(i => i.RetailerName == "CorinaSweets").ID
+RetailerID = retailers.Single(i => i.RetailerName == "CorinaSweets").ID
  },
  new RetailedPie {
  PieID = pies.Single(c => c.Name == "Tarta cu lapte condensat si lime" ).ID,
-RetailerID = publishers.Single(i => i.RetailerName == "Byron").ID
+RetailerID = retailers.Single(i => i.RetailerName == "Byron").ID
  },
- new RetailedPie {PieID = pies.Single(c => c.Name == "Placinta cu gutui" ).ID, RetailerID = publishers.Single(i => i.RetailerName == "Byron").ID
+ new RetailedPie {PieID = pies.Single(c => c.Name == "Placinta cu gutui" ).ID, RetailerID = retailers.Single(i => i.RetailerName == "Byron").ID
  },
- new RetailedPie {PieID = pies.Single(c => c.Name == "Placinta cu dovleac" ).ID, RetailerID = publishers.Single(i => i.RetailerName == "Byron").ID
+ new RetailedPie {PieID = pies.Single(c => c.Name == "Placinta cu dovleac" ).ID, RetailerID = retailers.Single(i => i.RetailerName == "Byron").ID
  },
- new RetailedPie {PieID = pies.Single(c => c.Name == "Tarta cu marar" ).ID, RetailerID = publishers.Single(i => i.RetailerName == "Mama Luta").ID
+ new RetailedPie {PieID = pies.Single(c => c.Name == "Tarta cu marar" ).ID, RetailerID = retailers.Single(i => i.RetailerName == "Mama Luta").ID
  },
  };
-            foreach (RetailedPie pb in publishedpies)
+            foreach (RetailedPie pb in retailedpies)
             {
                 context.RetailedPies.Add(pb);
             }

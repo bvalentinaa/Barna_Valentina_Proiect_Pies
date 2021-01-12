@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Barna_Valentina_Proiect_Pies.Models.LibraryViewModels.OrderGroup>
+@{
+    ViewData["Title"] = "Ordered Pies Statistics";
+}
+<h2>Ordered Pies Statistics</h2>
+<table>
+    <tr>
+        <th>
+            Order Date
+        </th>
+        <th>
+            Ordered Pies
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDate)
+            </td>
+            <td>
+                @item.PieCount
+            </td>
+        </tr>
+    }
+</table>
